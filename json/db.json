@@ -35,7 +35,7 @@
     {
       "id": 5,
       "name": "Tran Van C",
-      "gender": "Male",
+      "gender": "Famale",
       "day_off": 10,
       "payrate": 13,
       "phone_Number": "02347281324"
@@ -67,7 +67,7 @@
     {
       "id": 9,
       "name": "Hoàng Thị Hà",
-      "gender": "Male",
+      "gender": "Famale",
       "day_off": 10,
       "payrate": 13,
       "phone_Number": "02347281324"
@@ -91,7 +91,7 @@
     {
       "id": 12,
       "name": "Tran Van Huyền",
-      "gender": "Male",
+      "gender": "Famale",
       "day_off": 10,
       "payrate": 13,
       "phone_Number": "02347281324"

@@ -37,7 +37,7 @@ const TableEmployee = ({
         <TableBody>
           {currentEmployees.length > 0 &&
             currentEmployees.map((item, index) => (
-              <TableRow className="list-employee" key={item.id}>
+              <TableRow className="list-employee" key={index}>
                 <TableCell>
                   {index + 1 + (currentPage - 1) * newsPerPage}
                 </TableCell>

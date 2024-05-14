@@ -7,63 +7,95 @@ import useDebounce from "@/hook/useDebounce";
 import PaginationGlobal from "@/components/pagination/PaginationGlobal";
 import ModalCreateEmployee from "@/modal/ModalCreateEmployee";
 import TableEmployee from "@/components/table/TableEmployee";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const EmployeePage = () => {
   const [id, setId] = useState(0);
   const [openModal, setOpenModal] = useState(false);
   const [openCreateModal, setOpenCreateModal] = useState(false);
 
+  const [filterGender, setFilterGender] = useState("");
   const [filter, setFilter] = useState("");
   const [url, setUrl] = useState(tmdbAPI.getAPI("employee"));
   const filterDebounce = useDebounce(filter, 500);
-  const handleFilterChange = (e) => {
-    const filterValue = e.target.value;
-    setFilter(filterValue); // Update filter state
-
-    // Construct the URL based on the filter value
-    const filteredUrl = `${tmdbAPI.getAPI("employee")}?filter=${filterValue}`;
-
-    // Set the filtered URL to fetch data
-    setUrl(filteredUrl);
-  };
+  //
   const { data, error } = useSWR(url, fetcher);
-  useEffect(() => {
-    if (filterDebounce) {
-      setUrl(tmdbAPI.getAPI("employee"));
-    }
-  }, [filterDebounce]);
-  const employeeData = data || [];
+  // useEffect(() => {
+  //   let filteredUrl = tmdbAPI.getAPI("employee");
+  //   if (filterDebounce) {
+  //     // filteredUrl += `?gender=${filterDebounce}`;
+  //   }
+  //   setUrl(filteredUrl);
+  // }, [filterDebounce]);
 
+  const employeeData = data || [];
+  console.log(data);
   // console.log(employeeData);
 
   // handle remove employee
-  const [newEmployee, setNewEmployee] = useState([]);
-  const handleRemoveEmployee = async (id) => {
-    try {
-      const updatedEmployee = employeeData.filter((emp) => emp.id !== id);
-      // update new employee
-      setNewEmployee(updatedEmployee);
-    } catch (error) {
-      console.error("Error removing employee:", error);
-    }
+  // const [newEmployee, setNewEmployee] = useState([]);
+  // const handleRemoveEmployee = async (id) => {
+  //   try {
+  //     const updatedEmployee = employeeData.filter((emp) => emp.id !== id);
+  //     // update new employee
+  //     setNewEmployee(updatedEmployee);
+  //   } catch (error) {
+  //     console.error("Error removing employee:", error);
+  //   }
+  // };
+  // console.log(employeeData);
+
+  // handle Filter Change
+  const [newEmployeeData, setNewEmployeeData] = useState(employeeData);
+  console.log(newEmployeeData);
+  console.log(employeeData);
+  const handleFilterGenderChange = (value) => {
+    const updatedEmployeeData = employeeData.filter(
+      (emp) => emp.gender === value
+    );
+    console.log(updatedEmployeeData);
+
+    setNewEmployeeData(updatedEmployeeData);
+    setFilterGender(value);
   };
-  // console.log(newEmployee);
+  // console.log(filterGender);
 
   // handle next page
   const [currentPage, setCurrentPage] = useState(1);
   const [newsPerPage, setNewsPerPage] = useState(5);
   const indexOfLastEmployee = currentPage * newsPerPage;
   const indexOfFirstEmployee = indexOfLastEmployee - newsPerPage;
-  const currentEmployees = employeeData.slice(
+  const currentEmployees = newEmployeeData.slice(
     indexOfFirstEmployee,
     indexOfLastEmployee
   );
+  // let currentEmployees = [];
+  // if (newEmployeeData.length !== 0) {
+  //   currentEmployees = newEmployeeData.slice(
+  //     indexOfFirstEmployee,
+  //     indexOfLastEmployee
+  //   );
+  // } else {
+  //   currentEmployees = employeeData.slice(
+  //     indexOfFirstEmployee,
+  //     indexOfLastEmployee
+  //   );
+  // }
 
   // console.log(currentEmployees);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
+
   return (
     <Fragment>
       <div className="py-7 px-10">
@@ -81,16 +113,20 @@ const EmployeePage = () => {
             >
               Create
             </button>
-            <select className="font-bold bg-[#F5F5F5] w-[150px] py-2 px-2 rounded-lg">
-              <option value="" hidden>
-                Sort
-              </option>{" "}
-            </select>
-            <select className="font-bold bg-[#F5F5F5] w-[150px] py-2 px-2 ml-8 rounded-lg">
-              <option value="" hidden>
-                Filter
-              </option>{" "}
-            </select>
+            <Select
+              className="font-bold bg-[#F5F5F5] w-[150px] py-2 px-2 rounded-lg"
+              onValueChange={handleFilterGenderChange}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="filter" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="Male">Male</SelectItem>
+                  <SelectItem value="Famale">Famale</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </div>
         </div>
         <TableEmployee
@@ -101,10 +137,10 @@ const EmployeePage = () => {
           setId={setId}
         ></TableEmployee>
         <PaginationGlobal
-          employee={employeeData || []}
+          employee={newEmployeeData || []}
           currentPage={currentPage}
           onPageChange={handlePageChange}
-          handleRemoveEmployee={handleRemoveEmployee}
+          // handleRemoveEmployee={handleRemoveEmployee}
         ></PaginationGlobal>
       </div>
       <ModalEmployee
@@ -112,7 +148,7 @@ const EmployeePage = () => {
         handleClose={() => {
           setOpenModal(false);
         }}
-        item={employeeData.find((emp) => emp.id === id)}
+        item={newEmployeeData.find((emp) => emp.id === id)}
       ></ModalEmployee>
       <ModalCreateEmployee
         open={openCreateModal}
